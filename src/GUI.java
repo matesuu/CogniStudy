@@ -417,6 +417,7 @@ public class GUI {
         }
     }
 
+    // Animated Button with gradient background and hover/press effects
     class AnimatedButton extends JButton {
 
         private float scale = 1f;
