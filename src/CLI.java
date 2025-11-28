@@ -10,7 +10,7 @@ public class CLI
 
         set = new FlashcardSet("Cards/cards.csv");
         set.displayTerm(0);
-        set.remove("twinkle");
+        // set.remove("twinkle");
         set.displayInfo("amreen");
         set.saveData("Cards/cards.csv");
         
