@@ -59,7 +59,7 @@ public class GUI {
         background.add(centerPanel, BorderLayout.CENTER);
 
         JLabel credits = new JLabel(
-                "Created by Mateo Alado, Amreen Ahmed, Sanad Atia, Ohenewaa Ampem Darko, and Twinkle Johnson - Fall 2025",
+                "Created by Mateo Alado, Amreen Ahmed, Sanad Atia, Ohenewaa Ampem Darko, and Twinkle Wilson - Fall 2025",
                 SwingConstants.CENTER);
         credits.setFont(new Font("Helvetica", Font.PLAIN, 16));
         credits.setForeground(Color.WHITE);
