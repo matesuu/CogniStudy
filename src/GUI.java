@@ -73,17 +73,17 @@ public class GUI {
         background.add(credits, BorderLayout.SOUTH);
 
         reviewButton.addActionListener(e -> {
-            frame.dispose();
+
             reviewGUI();
         });
 
         createButton.addActionListener(e -> {
-            frame.dispose();
+
             createModifyGUI();
         });
 
         folderButton.addActionListener(e -> {
-            frame.dispose();
+
             folderGUI();
         });
 
@@ -102,7 +102,7 @@ public class GUI {
 
     public void reviewGUI() {
         JFrame reviewFrame = new JFrame("Review Flashcards");
-        reviewFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         reviewFrame.setLayout(new BorderLayout());
         reviewFrame.setResizable(true);
 
@@ -183,7 +183,7 @@ public class GUI {
     public void folderGUI()
     {
         JFrame folderFrame = new JFrame("Create a New Folder");
-        folderFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         folderFrame.setResizable(true);
 
         JPanel mainPanel = new GradientPanel();
@@ -241,7 +241,7 @@ public class GUI {
 
     public void createModifyGUI() {
         JFrame createFrame = new JFrame("Edit and Modify");
-        createFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         createFrame.setResizable(true);
 
         JPanel mainPanel = new GradientPanel();
