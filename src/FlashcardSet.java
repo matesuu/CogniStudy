@@ -13,11 +13,23 @@ public class FlashcardSet
     private HashMap<String, String> cards = new HashMap<>(); // hashmap to store each term with its associated info
     private ArrayList<String> terms = new ArrayList<>(); // arraylist for storing names of terms as strings for convinience
     private int size = 0; // size of set
+    private String filepath = "";
     ArrayList<QA> questions = new ArrayList<>(); // Stores only terms (questions)
 
     public FlashcardSet(String filename) // constructor that reads data from a file
     {
-        loadData(filename);
+        setFilepath(filename);
+        loadData();
+    }
+
+    public void setFilepath(String filename)
+    {
+        filepath = filename;
+    }
+
+    public String getFilepath()
+    {
+        return filepath;
     }
 
     public int getSize() // returns size
@@ -41,9 +53,9 @@ public class FlashcardSet
         }
     }
     
-    public void loadData(String filename) // uses a filereader to read data
+    public void loadData() // uses a filereader to read data
     {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename)))
+        try (BufferedReader reader = new BufferedReader(new FileReader(this.getFilepath())))
         {
             String line = ""; // string to store current line in file
 
@@ -92,6 +104,11 @@ public class FlashcardSet
         {
             cards.put(term, newInfo);
         }
+    }
+
+    public boolean isTerm(String term)
+    {
+        return cards.containsKey(term);
     }
 
     public String getTerm(int index)
@@ -159,9 +176,9 @@ public class FlashcardSet
         return null;
     }
     
-    public void saveData(String filename)
+    public void saveData()
     {
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(filename)))
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(this.getFilepath())))
         {
             for(int i = 0; i < terms.size(); i++)
             {
