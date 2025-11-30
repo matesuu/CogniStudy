@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -231,6 +232,21 @@ public class GUI {
             String filename = textField.getText().trim();
             if (!filename.isEmpty()) {
 
+                File f = new File(dir + filename + ".csv");
+
+                if(!f.exists())
+                {
+                   try {
+                    f.createNewFile();
+                   }
+
+                   catch (Exception ex)
+                   {
+                    JOptionPane.showMessageDialog(null, "error creating new file");
+                    return;
+                   }
+                }
+                
                 set = new FlashcardSet(dir + filename + ".csv");
                 System.out.println("Loaded flashcard set: " + filename);
 
