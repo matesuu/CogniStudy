@@ -409,17 +409,39 @@ public class GUI {
 
                 String question = JOptionPane.showInputDialog(mainPanel,"Enter Question/Term:", JOptionPane.PLAIN_MESSAGE);
 
+                if(question == null || question.trim().isEmpty())
+                {
+                    JOptionPane.showMessageDialog(mainPanel, "Invalid Term. Make Sure it's Not Empty.");
+                    return ;
+                }
+
                 if(!set.isTerm((question)))
                 {
                     String answer = JOptionPane.showInputDialog(mainPanel, "Enter Answer/Definition:", JOptionPane.PLAIN_MESSAGE);
+                    
+                    if(answer == null || answer.trim().isEmpty())
+                    {
+                        JOptionPane.showMessageDialog(mainPanel, "Invalid Definition. Make Sure it's Not Empty.");
+                        return ;
+                    }
+
                     set.add(question, answer);
+                    JOptionPane.showMessageDialog(mainPanel, "Term Added Sucessfully.");
                     set.saveData();
                 }
 
                 else
                 {
                     String answer = JOptionPane.showInputDialog(mainPanel, "Enter Answer/Definition:", JOptionPane.PLAIN_MESSAGE);
+
+                    if(answer == null || answer.trim().isEmpty())
+                    {
+                        JOptionPane.showMessageDialog(mainPanel, "Invalid Definition. Make Sure it's Not Empty.");
+                        return ;
+                    }
+
                     set.edit(question, answer);
+                    JOptionPane.showMessageDialog(mainPanel, "Term Edited Sucessfully. Exit and Review to Save Changes.");
                     set.saveData();
                 }
 
@@ -435,6 +457,7 @@ public class GUI {
             if(set != null && !set.questions.isEmpty()) {
 
                 set.remove(set.getTerm(currentIndex[0]));
+                JOptionPane.showMessageDialog(mainPanel, "Term Removed Sucessfully. Exit and Review to Save Changes.");
 
                 currentIndex[0] = 0;
                 showQuestion[0] = true;
