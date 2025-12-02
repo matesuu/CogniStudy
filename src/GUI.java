@@ -55,7 +55,7 @@ public class GUI {
         createButton.setPreferredSize(new Dimension(200, 200));
         createButton.setGradient(new Color(255, 64, 129), new Color(197, 17, 98)); // Hot pink → magenta
 
-        AnimatedButton folderButton = new AnimatedButton("Create a New Folder");
+        AnimatedButton folderButton = new AnimatedButton("Take a Quiz");
         folderButton.setPreferredSize(new Dimension(200, 200));
         folderButton.setGradient(new Color(76, 175, 80), new Color(56, 142, 60)); // Green Gradient
 
@@ -84,7 +84,7 @@ public class GUI {
 
         folderButton.addActionListener(e -> {
 
-            folderGUI();
+            testGUI();
         });
 
         frame.pack();
@@ -180,63 +180,223 @@ public class GUI {
         });
     }
 
-    public void folderGUI()
+    public JPanel testUI()
     {
-        JFrame folderFrame = new JFrame("Create a New Folder");
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setPreferredSize(new Dimension(600, 300));
+        mainPanel.setOpaque(false);
 
-        folderFrame.setResizable(true);
+        JPanel cardPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                int w = getWidth();
+                int h = getHeight();
+                GradientPaint gp = new GradientPaint(0, 0, new Color(255,255,255),
+                        0, h, new Color(230,230,230));
+                g2.setPaint(gp);
+                g2.fillRoundRect(0, 0, w, h, 20, 20);
 
-        JPanel mainPanel = new GradientPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        folderFrame.add(mainPanel);
+                g2.setColor(new Color(0,0,0,40));
+                g2.fillRoundRect(4,4,w-8,h-8,20,20);
 
-        JPanel textBoxPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JLabel textBoxLabel = new JLabel("Enter a New Folder: ");
-        JTextField textField = new JTextField(20);
-        textField.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2, true));
-
-        AnimatedButton submitButton = new AnimatedButton("Select");
-        submitButton.setPreferredSize(new Dimension(120, 40));
-
-        textBoxPanel.add(textBoxLabel);
-        textBoxPanel.add(textField);
-        textBoxPanel.add(submitButton);
-        folderFrame.add(textBoxPanel, BorderLayout.CENTER);
-
-        folderFrame.pack();
-        folderFrame.setLocationRelativeTo(null);
-        folderFrame.setVisible(true);
-
-        submitButton.addActionListener(e -> {
-            String folderName = textField.getText().trim();
-
-            if(folderName.isEmpty()){
-                JOptionPane.showMessageDialog(folderFrame, "Please enter a folder name: ");
-                return;
+                g2.dispose();
             }
+        };
+        cardPanel.setLayout(new BorderLayout());
+        cardPanel.setBorder(new EmptyBorder(20,20,20,20));
 
-            File newFolder = new File("Cards/" + folderName + ".csv");
+        sharedProgressLabel = new JLabel("0 / 0", SwingConstants.CENTER);
+        sharedProgressLabel.setFont(new Font("Helvetica", Font.PLAIN, 16));
+        cardPanel.add(sharedProgressLabel, BorderLayout.NORTH);
 
-            if(newFolder.exists())
-            {
-                JOptionPane.showMessageDialog(folderFrame, "This folder already exists! Please choose a new name: ");
-                return;
+        sharedCardLabel = new JLabel("Your Card Appears Here", SwingConstants.CENTER);
+        sharedCardLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        sharedCardLabel.setForeground(Color.DARK_GRAY);
+        sharedCardLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        cardPanel.add(sharedCardLabel, BorderLayout.CENTER);
+
+        mainPanel.add(cardPanel, BorderLayout.CENTER);
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.setOpaque(false);
+        Dimension buttonSize = new Dimension(120, 40);
+        
+        AnimatedButton answerButton = new AnimatedButton("Answer");
+        answerButton.setPreferredSize(buttonSize);
+        answerButton.setGradient(new Color(255, 64, 129), new Color(197, 17, 98));
+
+        AnimatedButton finishButton = new AnimatedButton("Submit Quiz");
+        finishButton.setPreferredSize(buttonSize);
+        finishButton.setGradient(new Color(76, 175, 80), new Color(56, 142, 60));
+
+        buttonPanel.add(answerButton);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        final int[] currentIndex = {0};
+        final boolean[] showQuestion = {true};
+
+        Runnable updateCard = () -> {
+            if (set != null && !set.questions.isEmpty()) {
+
+                sharedCurrentIndex = currentIndex[0];
+                sharedShowQuestion = !showQuestion[0];
+
+                QA current = set.questions.get(sharedCurrentIndex);
+                sharedCardLabel.setText(sharedShowQuestion ? current.getQuestion() : current.getAnswer());
+                sharedProgressLabel.setText((sharedCurrentIndex+1) + " / " + set.questions.size());
+
+            } else {
+                sharedProgressLabel.setText("0 / 0");
+                sharedCardLabel.setText("No cards available");
             }
+        };
 
-            try
-            {
-                newFolder.createNewFile();
-                JOptionPane.showMessageDialog(folderFrame, "Folder Created Successfully!");
-            }
+        sharedUpdateCard = updateCard;
+        updateCard.run();
 
-            catch (Exception ex)
-            {
-                JOptionPane.showMessageDialog(folderFrame, "Unable to create folder");
-                ex.printStackTrace();
-                return;
+        answerButton.addActionListener(e -> {
+            if (set != null && !set.questions.isEmpty()) {
+
+                
+                
+                QA temp = set.questions.get(currentIndex[0]);
+                String userAnswer = JOptionPane.showInputDialog(mainPanel, "Your Answer: ", JOptionPane.PLAIN_MESSAGE);
+
+              
+                if(userAnswer == null)
+                {
+                    return ;
+                }
+
+                String correctAnswer = temp.getQuestion();
+
+                if(userAnswer.trim().equalsIgnoreCase(correctAnswer.trim()))
+                {
+                    JOptionPane.showMessageDialog(mainPanel, "Correct!");
+                    currentIndex[0] = (currentIndex[0]+1)%set.questions.size();
+                    showQuestion[0] = true;
+                    updateCard.run();
+                    set.incrementScore();
+                }
+
+                else
+                {
+                    JOptionPane.showMessageDialog(mainPanel, "Incorrect! The Correct Answer is: \n" + correctAnswer);
+                    currentIndex[0] = (currentIndex[0]+1)%set.questions.size();
+                    showQuestion[0] = true;
+                    updateCard.run();
+                }
+
+                if(currentIndex[0] == 0)
+                {
+                        int totalQuestions = set.questions.size();
+                        int score = set.getScore();
+
+                        double percentage = ((double)score / (double)totalQuestions) * 100.0; 
+
+                        JOptionPane.showMessageDialog(mainPanel, "Quiz Finished!\n Your score for this attempt is: " + percentage);
+                        JOptionPane.showMessageDialog(mainPanel, "A new quiz attempt will automatically start. To exit, please close the test window.");
+                        set.resetScore();
+
+                        return ;
+                }
             }
         });
 
+        InputMap im = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = mainPanel.getActionMap();
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,0),"prev");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,0),"next");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0),"flip");
+
+        am.put("prev", new AbstractAction() {@Override public void actionPerformed(ActionEvent e){ if(set!=null&&!set.questions.isEmpty()){currentIndex[0]=(currentIndex[0]-1+set.questions.size())%set.questions.size(); showQuestion[0]=true; updateCard.run();}}});
+        am.put("next", new AbstractAction() {@Override public void actionPerformed(ActionEvent e){ if(set!=null&&!set.questions.isEmpty()){currentIndex[0]=(currentIndex[0]+1)%set.questions.size(); showQuestion[0]=true; updateCard.run();}}});
+        am.put("flip", new AbstractAction() {@Override public void actionPerformed(ActionEvent e){ if(set!=null&&!set.questions.isEmpty()){showQuestion[0]=!showQuestion[0]; updateCard.run();}}});
+
+        return mainPanel;
+    }
+
+    public void testGUI()
+    {
+        JFrame testFrame = new JFrame("Take a Quiz");
+
+        testFrame.setLayout(new BorderLayout());
+        testFrame.setResizable(true);
+
+        JPanel textBoxPanel = new JPanel();
+        JLabel textBoxLabel = new JLabel("Enter a Flashcard Set: ");
+        JTextField textField = new JTextField(20);
+        JButton submitButton = new JButton("Select");
+        textBoxPanel.add(textBoxLabel);
+        textBoxPanel.add(textField);
+        textBoxPanel.add(submitButton);
+        testFrame.add(textBoxPanel, BorderLayout.NORTH);
+
+        JPanel testPanel = new JPanel();
+        JButton cardButton = new JButton("Start");
+        cardButton.setFont(new Font("Helvetica", Font.PLAIN, 24));
+        cardButton.setEnabled(false);
+        testPanel.add(cardButton);
+        testFrame.add(testPanel, BorderLayout.CENTER);
+
+        testFrame.pack();
+        testFrame.setLocationRelativeTo(null);
+        testFrame.setVisible(true);
+
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = textField.getText().trim();
+                if (name.isEmpty()) {
+                    JOptionPane.showMessageDialog(testFrame, "Please enter a filename.");
+                    return;
+                }
+                java.io.File f = resolveSetFile(name);
+                if (f == null) {
+                    JOptionPane.showMessageDialog(
+                            testFrame,
+                            "File not found:\n• Cards/" + name + ".csv\n• ../Cards/" + name + ".csv"
+                    );
+                    return;
+                }
+
+                FlashcardSet loaded = new FlashcardSet(f.getPath());
+                if (loaded.getSize() <= 0) {
+                    JOptionPane.showMessageDialog(testFrame, "That file has no cards.");
+                    return;
+                }
+
+                filename = name;
+                set = loaded;
+
+                textBoxPanel.remove(textBoxLabel);
+                textBoxPanel.remove(textField);
+                textBoxPanel.remove(submitButton);
+                testFrame.revalidate();
+                testFrame.repaint();
+
+                cardButton.setEnabled(true);
+            }
+        });
+
+        cardButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (set == null || set.questions.isEmpty()) {
+                    JOptionPane.showMessageDialog(testFrame, "Load a flashcard set first.");
+                    return;
+                }
+                JFrame reviewWindow = new JFrame("Test: " + filename);
+                reviewWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                reviewWindow.setLayout(new BorderLayout());
+                reviewWindow.add(testUI(), BorderLayout.CENTER);
+                reviewWindow.pack();
+                reviewWindow.setLocationRelativeTo(null);
+                reviewWindow.setVisible(true);
+            }
+        });
     }
 
     public void createModifyGUI() {
@@ -355,6 +515,10 @@ public class GUI {
         buttonPanel.setOpaque(false);
         Dimension buttonSize = new Dimension(120, 40);
 
+        AnimatedButton newButton = new AnimatedButton("New Set");
+        newButton.setPreferredSize(buttonSize);
+        newButton.setGradient(new Color(76, 175, 80), new Color(56, 142, 60));
+
         AnimatedButton addButton = new AnimatedButton("Add/Modify");
         addButton.setPreferredSize(buttonSize);
         addButton.setGradient(new Color(255, 152, 0), new Color(245, 124, 0));
@@ -375,11 +539,11 @@ public class GUI {
         nextButton.setPreferredSize(buttonSize);
         nextButton.setGradient(new Color(139, 195, 74), new Color(104, 159, 56));
         
-
+        buttonPanel.add(newButton);
         buttonPanel.add(addButton);
-        buttonPanel.add(prevButton);
-        buttonPanel.add(flipButton);
         buttonPanel.add(nextButton);
+        buttonPanel.add(flipButton);
+        buttonPanel.add(prevButton);
         buttonPanel.add(removeButton);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -403,6 +567,39 @@ public class GUI {
 
         sharedUpdateCard = updateCard;
         updateCard.run();
+
+        newButton.addActionListener(e -> {
+
+            String name = JOptionPane.showInputDialog(mainPanel, "Enter a New Folder Name:", JOptionPane.PLAIN_MESSAGE);
+
+            if(name == null || name.trim().isEmpty())
+            {
+                JOptionPane.showMessageDialog(mainPanel, "Invalid Folder Name. Make Sure it's Not Empty.");
+                return ;
+            }
+
+            File newFolder = new File("Cards/" + name + ".csv");
+
+            if(newFolder.exists())
+            {
+                JOptionPane.showMessageDialog(mainPanel, "This Folder already exists! Please choose a new name: ");
+                return ;
+            }
+
+            try
+            {
+                newFolder.createNewFile();
+                JOptionPane.showMessageDialog(mainPanel, "Folder Created Successfully!");
+                return ;
+            }
+
+            catch (Exception ex)
+            {
+                JOptionPane.showMessageDialog(mainPanel, "Unable to Create Folder.");
+                ex.printStackTrace();
+                return ;
+            }
+        });
 
         addButton.addActionListener(e -> {
             if (set != null ) {
@@ -565,9 +762,9 @@ public class GUI {
         nextButton.setGradient(new Color(139, 195, 74), new Color(104, 159, 56));
 
         buttonPanel.add(shuffleButton);
-        buttonPanel.add(prevButton);
-        buttonPanel.add(flipButton);
         buttonPanel.add(nextButton);
+        buttonPanel.add(flipButton);
+        buttonPanel.add(prevButton);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         final int[] currentIndex = {0};

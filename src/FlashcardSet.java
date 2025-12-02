@@ -13,6 +13,7 @@ public class FlashcardSet
     private HashMap<String, String> cards = new HashMap<>(); // hashmap to store each term with its associated info
     private ArrayList<String> terms = new ArrayList<>(); // arraylist for storing names of terms as strings for convinience
     private int size = 0; // size of set
+    private int score = 0; // score for quizzes;
     private String filepath = "";
     ArrayList<QA> questions = new ArrayList<>(); // Stores only terms (questions)
 
@@ -20,6 +21,7 @@ public class FlashcardSet
     {
         setFilepath(filename);
         loadData();
+        score = 0;
     }
 
     public void setFilepath(String filename)
@@ -35,6 +37,27 @@ public class FlashcardSet
     public int getSize() // returns size
     {
         return terms.size();
+    }
+
+    public void setScore(int s)
+    {
+        score = s;
+    }
+
+    public int getScore()
+    {
+        return score;
+    }
+
+    public void resetScore()
+    {
+        score = 0;
+    }
+
+    public int incrementScore()
+    {
+        score++;
+        return score;
     }
 
     public void display()
