@@ -295,7 +295,7 @@ public class GUI {
 
                         double percentage = ((double)score / (double)totalQuestions) * 100.0; 
 
-                        JOptionPane.showMessageDialog(mainPanel, "Quiz Finished!\n Your score for this attempt is: " + percentage);
+                        JOptionPane.showMessageDialog(mainPanel, "Quiz Finished!\nYour score for this attempt is: " + percentage);
                         JOptionPane.showMessageDialog(mainPanel, "A new quiz attempt will automatically start. To exit, please close the test window.");
                         set.resetScore();
 
