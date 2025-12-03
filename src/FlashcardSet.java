@@ -14,6 +14,8 @@ public class FlashcardSet
     private ArrayList<String> terms = new ArrayList<>(); // arraylist for storing names of terms as strings for convinience
     private int size = 0; // size of set
     private int score = 0; // score for quizzes;
+    private int answers = 0; // number of questions answered
+    private boolean quizFlag = false; // flag to indicate quiz in session
     private String filepath = "";
     ArrayList<QA> questions = new ArrayList<>(); // Stores only terms (questions)
 
