@@ -236,6 +236,8 @@ public class GUI {
         final int[] currentIndex = {0};
         final boolean[] showQuestion = {true};
 
+        set.shuffle();
+
         Runnable updateCard = () -> {
             if (set != null && !set.questions.isEmpty()) {
 
@@ -258,8 +260,6 @@ public class GUI {
         answerButton.addActionListener(e -> {
             if (set != null && !set.questions.isEmpty()) {
 
-                
-                
                 QA temp = set.questions.get(currentIndex[0]);
                 String userAnswer = JOptionPane.showInputDialog(mainPanel, "Your Answer: ", JOptionPane.PLAIN_MESSAGE);
 
@@ -298,6 +298,8 @@ public class GUI {
                         JOptionPane.showMessageDialog(mainPanel, "Quiz Finished!\nYour score for this attempt is: " + percentage);
                         JOptionPane.showMessageDialog(mainPanel, "A new quiz attempt will automatically start. To exit, please close the test window.");
                         set.resetScore();
+                        set.shuffle();
+                        updateCard.run();
 
                         return ;
                 }
